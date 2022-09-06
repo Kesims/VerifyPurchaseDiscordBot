@@ -170,7 +170,7 @@ class VerifyBot:
     async def verify(self, ctx, email: str, username: str):
 
         if not isValid(email):
-            await ctx.send(f"You must provide a valid email!", hidden=True)
+            await ctx.send(f"You must provide a valid email!", ephemeral=True)
             return
 
         email = email.lower()
@@ -187,7 +187,7 @@ class VerifyBot:
         if len(available_roles) == 0:
             raise AlreadyVerifiedPurchases()
 
-        await ctx.defer(hidden=True)
+        await ctx.defer(ephemeral=True)
         self.update_purchases()
         user_id, verified_purchases = self.get_previously_verified_purchases(email)
         purchases = self.find_purchases_by_email(email)
