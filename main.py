@@ -29,13 +29,13 @@ async def on_message(message):
     if message.author.id == bot.user.id:
         return
     role = discord.utils.get(message.guild.roles, id=ADMIN_ROLE_ID)
-    if role not in message.author.roles and message.channel.id == VERIFY_CHANNEL_ID:
+    if not hasattr(message.author, "roles"):
+        return
+    if message.channel.id == VERIFY_CHANNEL_ID and role not in message.author.roles:
         await message.delete()
 
 
 # discord bot command to add a role to a user
-#@bot.hybrid_command(pass_context=True, description="Add a role to a user")
-#@app_commands.describe(role_id="ID of the role you want to add")
 async def add_role(ctx, role_id):
     member = ctx.author
     role = get(member.guild.roles, id=int(role_id))
@@ -43,7 +43,6 @@ async def add_role(ctx, role_id):
 
 
 # send a direct message to a list of admins
-#@bot.hybrid_command(pass_context=True, description="Send a direct message to a list of admins")
 async def dm_admins(ctx, email, username, roles_given, verified):
     if verified:
         message = "{} successfully verified a purchase with email: ".format(
@@ -59,7 +58,6 @@ async def dm_admins(ctx, email, username, roles_given, verified):
 
 
 # send a report message into a channel
-#@bot.hybrid_command(pass_context=True, descritption="Send a report message")
 async def channel_message(author, email, username, roles, verified):
     channel = bot.get_channel(REPORT_CHANNEL_ID)
     roles_message = ""
@@ -99,6 +97,7 @@ async def on_ready():
 @app_commands.describe(email="Your PayPal email", username="Your SpigotMC or BitByBit username.")
 async def _verifypurchase(ctx, email: str, username: str):
     if not (ctx.channel.id == VERIFY_CHANNEL_ID):
+        await ctx.reply(f"This command is available only in channel dedicated for verification.", ephemeral=True)
         return
 
     try:
